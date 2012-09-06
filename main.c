@@ -19,7 +19,8 @@
 /* User Global Variable Declaration                                           */
 /******************************************************************************/
 cliParam_t sramWriteParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"data", CLI_PARAM_TYPE_UCHAR}};
-cliParam_t sramPrintparams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
+cliParam_t sramPrintParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
+cliParam_t sramWriteBytesParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
 
 void sramWriteCbk(const char* cmdName, char** params, unsigned char numParams)
 {
@@ -33,6 +34,23 @@ void sramPrintCbk(const char* cmdName, char** params, unsigned char numParams)
     unsigned int addr = atol(params[0]);
     unsigned int count = atol(params[1]);
     SRAM_Print(addr, count);
+}
+
+void sramWriteBytesCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+#define RX_INDICATOR_COUNT 512
+    unsigned int addr = atol(params[0]);
+    unsigned int numBytes = atol(params[1]);
+    unsigned int currCnt = 0;
+
+    while(currCnt < numBytes)
+    {
+        SRAM_Write(addr++, getchar());
+        if(RX_INDICATOR_COUNT-1 == currCnt % RX_INDICATOR_COUNT)
+            putch('.');
+        currCnt++;
+    }
+    printf("Done\r\n");
 }
 
 void testCbk(const char* cmdName, char** params, unsigned char numParams)
@@ -57,8 +75,9 @@ uint8_t main(void)
     cliInit();
 
     // CLI Command registration
-    CLI_REGISTER_CMD("md", sramPrintCbk, sramPrintparams);
+    CLI_REGISTER_CMD("md", sramPrintCbk, sramPrintParams);
     CLI_REGISTER_CMD("mw", sramWriteCbk, sramWriteParams);
+    CLI_REGISTER_CMD("mm", sramWriteBytesCbk, sramWriteBytesParams);
     //CLI_REGISTER_CMD("t", testCbk, 0);
 
     // Application Loop
