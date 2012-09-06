@@ -108,8 +108,7 @@ void SRAM_Write(unsigned long int addr, unsigned char data)
 
 void SRAM_Print(unsigned int addr, unsigned int count)
 {
-    unsigned char numBlanks;
-    numBlanks = addr % SRAM_PRINT_ROW_CNT;
+    unsigned char numBlanks = addr % SRAM_PRINT_ROW_CNT;
 
     if(numBlanks)
     {
