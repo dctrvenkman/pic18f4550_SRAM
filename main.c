@@ -19,29 +19,6 @@
 /* User Global Variable Declaration                                           */
 /******************************************************************************/
 
-cliParam_t params[] = {{"x", CLI_PARAM_TYPE_UINT}, {"y", CLI_PARAM_TYPE_UINT}};
-
-void addCbk(const char* cmdName, char** params, unsigned char numParams)
-{
-    printf("%s + %s = %f\r\n", params[0], params[1], atof(params[0]) + atof(params[1]));
-}
-void subCbk(const char* cmdName, char** params, unsigned char numParams)
-{
-    float p1 = atof(params[0]);
-    float p2 = atof(params[1]);
-    float result = p1 - p2;
-    printf("%s - %s = %f\r\n", params[0], params[1], result);
-}
-void mulCbk(const char* cmdName, char** params, unsigned char numParams)
-{
-    printf("%s * %s = %f\r\n", params[0], params[1], atof(params[0]) * atof(params[1]));
-}
-void divCbk(const char* cmdName, char** params, unsigned char numParams)
-{
-    printf("%s / %s = %f\r\n", params[0], params[1], atof(params[0]) / atof(params[1]));
-}
-
-
 cliParam_t sramReadBparams[] = {{"address", CLI_PARAM_TYPE_UINT}};
 
 void sramReadBCbk(const char* cmdName, char** params, unsigned char numParams)
@@ -65,6 +42,7 @@ void testCbk(const char* cmdName, char** params, unsigned char numParams)
 }
 
 cliParam_t sramPrintparams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
+
 void sramPrintCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int p1 = atol(params[0]);
@@ -87,12 +65,6 @@ uint8_t main(void)
     printf("\x1b[H"); // Home cursor
     printf("Console Initialized v1\r\n");
     cliInit();
-
-    CLI_REGISTER_CMD("add", addCbk, params);
-    CLI_REGISTER_CMD("sub", subCbk, params);
-    CLI_REGISTER_CMD("mul", mulCbk, params);
-    CLI_REGISTER_CMD("div", divCbk, params);
-
 
     CLI_REGISTER_CMD("md", sramPrintCbk, sramPrintparams);
     CLI_REGISTER_CMD("t", testCbk, 0);

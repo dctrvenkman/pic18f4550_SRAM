@@ -47,7 +47,7 @@ cliReturn_t cliRegisterCmd(const char* name, cliCmdCbk_t callback, unsigned char
 {
     cliReturn_t retVal = CLI_RETURN_SUCCESS;
 
-    if(cmdCount >= CLI_MAX_CMD_COUNT)
+    if(cmdCount == CLI_MAX_CMD_COUNT)
         retVal = CLI_RETURN_TOO_MANY_CMDS;
     else if(numParams > CLI_MAX_PARAM_COUNT)
         retVal = CLI_RETURN_TOO_MANY_PARAMS;

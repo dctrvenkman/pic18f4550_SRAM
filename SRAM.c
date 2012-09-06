@@ -108,26 +108,21 @@ void SRAM_Write(unsigned long int addr, unsigned char data)
 
 void SRAM_Print(unsigned int addr, unsigned int count)
 {
-    #define MAX_ROW_CNT	16
     unsigned char numBlanks;
-
-    numBlanks = addr % MAX_ROW_CNT;
+    numBlanks = addr % SRAM_PRINT_ROW_CNT;
 
     if(numBlanks)
     {
         printf("\r\n[0x%.4x]  ", addr - numBlanks);
         for(; numBlanks > 0; numBlanks--)
-            printf("     ");
+            printf("   ");
     }
 
     for(; count > 0; count--)
     {
-        if(!(addr % MAX_ROW_CNT))
-        {
-            //printf("\r\n[0x%x]\t", addr);
-            printf("\r\n[%08.04d]\t", addr);
-        }
-        printf("0x%2x ", SRAM_Read(addr++));
+        if(!(addr % SRAM_PRINT_ROW_CNT))
+            printf("\r\n[0x%.4x]  ", addr);
+        printf("%.2x ", SRAM_Read(addr++));
     }
     printf("\r\n");
 }

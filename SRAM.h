@@ -43,8 +43,10 @@
 #define SRAM_CE         PORTEbits.RE2
 
 
-#define SRAM_DELAY_US      100
+#define SRAM_DELAY_US   100
 
+// Number of bytes printed per line for SRAM_Print
+#define SRAM_PRINT_ROW_CNT  16
 
 #ifdef	__cplusplus
 extern "C" {
