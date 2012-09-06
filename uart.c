@@ -1,8 +1,3 @@
-// Fix for MPLAB to recognize chip definition which is passed as compiler flag
-#ifndef __18F4550
-#define __18F4550
-#endif
-
 #include "htc_wrapper.h"
 #include "uart.h"
 #include "cirBuff.h"
