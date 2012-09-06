@@ -18,36 +18,26 @@
 /******************************************************************************/
 /* User Global Variable Declaration                                           */
 /******************************************************************************/
+cliParam_t sramWriteParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"data", CLI_PARAM_TYPE_UCHAR}};
+cliParam_t sramPrintparams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
 
-cliParam_t sramReadBparams[] = {{"address", CLI_PARAM_TYPE_UINT}};
-
-void sramReadBCbk(const char* cmdName, char** params, unsigned char numParams)
+void sramWriteCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-    long int p1 = atol(params[0]);
-    printf("Read 0x%x\n", SRAM_Read(p1));
+    unsigned int addr = atoi(params[0]);
+    unsigned char data = atoi(params[1]);
+    SRAM_Write(addr, data);
 }
 
-
-cliParam_t sramWriteBparams[] = {/*{"address", CLI_PARAM_TYPE_UINT},*/ {"data", CLI_PARAM_TYPE_UCHAR}};
-
-void sramWriteBCbk(const char* cmdName, char** params, unsigned char numParams)
+void sramPrintCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-    unsigned char p1 = (unsigned char)atoi(params[0]);
-    SRAM_CE = p1;
+    unsigned int addr = atol(params[0]);
+    unsigned int count = atol(params[1]);
+    SRAM_Print(addr, count);
 }
 
 void testCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-    SRAM_OE ^= SRAM_OE;
-}
-
-cliParam_t sramPrintparams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
-
-void sramPrintCbk(const char* cmdName, char** params, unsigned char numParams)
-{
-    unsigned int p1 = atol(params[0]);
-    unsigned int p2 = atol(params[1]);
-    SRAM_Print(p1, p2);
+    //Do Something
 }
 
 /******************************************************************************/
@@ -66,11 +56,12 @@ uint8_t main(void)
     printf("Console Initialized v1\r\n");
     cliInit();
 
+    // CLI Command registration
     CLI_REGISTER_CMD("md", sramPrintCbk, sramPrintparams);
-    CLI_REGISTER_CMD("t", testCbk, 0);
-    CLI_REGISTER_CMD("r", sramReadBCbk, sramReadBparams);
-    CLI_REGISTER_CMD("w", sramWriteBCbk, sramWriteBparams);
+    CLI_REGISTER_CMD("mw", sramWriteCbk, sramWriteParams);
+    //CLI_REGISTER_CMD("t", testCbk, 0);
 
+    // Application Loop
     while(1)
     {
         cliReturn_t ret = cliParseInputChar(getchar());
