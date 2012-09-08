@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=trunk
+PROJECTNAME=pic18f4550_SRAM_test
 
 # Active Configuration
 DEFAULTCONF=default
