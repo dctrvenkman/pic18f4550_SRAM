@@ -197,6 +197,8 @@ const static char* paramDescrString[] = {"none",
                                          "char",
                                          "unsigned int",
                                          "int",
+                                         "unsigned long",
+                                         "long",
                                          "float",
                                          "void *"};
 

@@ -21,6 +21,7 @@
 cliParam_t sramWriteParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"data", CLI_PARAM_TYPE_UCHAR}};
 cliParam_t sramPrintParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
 cliParam_t sramWriteBytesParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
+cliParam_t params[] = {{"value", CLI_PARAM_TYPE_UINT}};
 
 void sramWriteCbk(const char* cmdName, char** params, unsigned char numParams)
 {
@@ -53,9 +54,37 @@ void sramWriteBytesCbk(const char* cmdName, char** params, unsigned char numPara
     printf("Done\r\n");
 }
 
+#include "SRAM.h"
 void testCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-    //Do Something
+    SRAM_Clear();
+}
+void ceCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    unsigned int val = atoi(params[0]) & 0xff;
+    SRAM_CE = val;
+}
+void weCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    unsigned int val = atoi(params[0]) & 0xff;
+    SRAM_WE = val;
+}
+void oeCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    unsigned int val = atoi(params[0]) & 0xff;
+    SRAM_OE = val;
+}
+void dCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    unsigned int val = atoi(params[0]) & 0xff;
+    TRISB = 0;
+    PORTB = val;
+}
+extern inline void setAddressLines(unsigned long int addr);
+void aCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    unsigned int val = atoi(params[0]) & 0xff;
+    setAddressLines(val);
 }
 
 /******************************************************************************/
@@ -78,7 +107,16 @@ uint8_t main(void)
     CLI_REGISTER_CMD("md", sramPrintCbk, sramPrintParams);
     CLI_REGISTER_CMD("mw", sramWriteCbk, sramWriteParams);
     CLI_REGISTER_CMD("mm", sramWriteBytesCbk, sramWriteBytesParams);
-    //CLI_REGISTER_CMD("t", testCbk, 0);
+    CLI_REGISTER_CMD("t", testCbk, 0);
+    CLI_REGISTER_CMD("ce", ceCbk, params);
+    CLI_REGISTER_CMD("we", weCbk, params);
+    CLI_REGISTER_CMD("oe", oeCbk, params);
+    CLI_REGISTER_CMD("d", dCbk, params);
+    CLI_REGISTER_CMD("a", aCbk, params);
+
+
+    //test();
+
 
     // Application Loop
     while(1)

@@ -19,7 +19,7 @@ void SRAM_Setup_Pins()
     TRISD = 0x00;   //PORTD[0:7] outputs
     TRISA &= 0xC0;  //PORTA[0:5] outputs
     TRISC &= 0xC0;  //PORTC[0:5] outputs
-    TRISB &= 0x00;  //PORTB[0:7] outputs
+    TRISB &= 0xFF;  //PORTB[0:7] inputs
     TRISE &= 0xF8;  //PORTE[0:2] outputs
 
     PORTA = 0;
@@ -83,11 +83,13 @@ inline void setAddressLines(unsigned long int addr)
 unsigned char SRAM_Read(unsigned long int addr)
 {
     unsigned char data;
+    SRAM_CE = 1;
+    SRAM_OE = 1;
     SRAM_WE = 1;
+    SRAM_DATA_TRIS = 0xFF;
     setAddressLines(addr);
     SRAM_CE = 0;
     SRAM_OE = 0;
-    __delay_us(SRAM_DELAY_US);
     data = getDataLines();
     SRAM_OE = 1;
     SRAM_CE = 1;
@@ -96,14 +98,17 @@ unsigned char SRAM_Read(unsigned long int addr)
 
 void SRAM_Write(unsigned long int addr, unsigned char data)
 {
+    SRAM_CE = 1;
+    SRAM_WE = 1;
     SRAM_OE = 1;
     setAddressLines(addr);
-    setDataLines(data);
     SRAM_CE = 0;
     SRAM_WE = 0;
-    __delay_us(SRAM_DELAY_US);
+    SRAM_DATA_TRIS = 0x00;
+    setDataLines(data);
     SRAM_WE = 1;
     SRAM_CE = 1;
+    SRAM_DATA_TRIS = 0xFF; // back to inputs just incase
 }
 
 void SRAM_Print(unsigned int addr, unsigned int count)
@@ -114,7 +119,7 @@ void SRAM_Print(unsigned int addr, unsigned int count)
     {
         printf("\r\n[0x%.4x]  ", addr - numBlanks);
         for(; numBlanks > 0; numBlanks--)
-            printf("   ");
+            printf(".. ");
     }
 
     for(; count > 0; count--)
@@ -124,4 +129,11 @@ void SRAM_Print(unsigned int addr, unsigned int count)
         printf("%.2x ", SRAM_Read(addr++));
     }
     printf("\r\n");
+}
+
+void SRAM_Clear()
+{
+    unsigned int i = 0xffff;
+    for(; i > 0; i--)
+        SRAM_Write(i, 0);
 }

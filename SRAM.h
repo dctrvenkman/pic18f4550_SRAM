@@ -32,6 +32,7 @@
 
 //D[0:8] = PORTB[0:8]
 #define SRAM_DATA_PORT  PORTB
+#define SRAM_DATA_TRIS  TRISB
 
 //OE = RE0
 #define SRAM_OE         PORTEbits.RE0
@@ -43,7 +44,7 @@
 #define SRAM_CE         PORTEbits.RE2
 
 
-#define SRAM_DELAY_US   100
+#define SRAM_DELAY_US   0//100 //@8MHz clk delay is 500ns
 
 // Number of bytes printed per line for SRAM_Print
 #define SRAM_PRINT_ROW_CNT  16
@@ -57,6 +58,7 @@ void SRAM_Setup_Pins();
 unsigned char SRAM_Read(unsigned long int addr);
 void SRAM_Write(unsigned long int addr, unsigned char data);
 void SRAM_Print(unsigned int addr, unsigned int count);
+void SRAM_Clear();
 
 #ifdef	__cplusplus
 }
