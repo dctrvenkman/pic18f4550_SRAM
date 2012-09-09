@@ -47,7 +47,7 @@ void EEPROMWriteBytesCbk(const char* cmdName, char** params, unsigned char numPa
 
     while(currCnt < numBytes)
     {
-        EEPROM_Write(addr++, getchar());
+        EEPROM_Page_Write(addr++, getchar());
         if(RX_INDICATOR_COUNT-1 == currCnt % RX_INDICATOR_COUNT)
             putch('.');
         currCnt++;
