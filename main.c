@@ -13,31 +13,32 @@
 #include "cirBuff.h"    /* Circular Buffer */
 #include "uart.h"
 #include "cliParser.h"
-#include "SRAM.h"
+#include "EEPROM.h"
 
 /******************************************************************************/
 /* User Global Variable Declaration                                           */
 /******************************************************************************/
-cliParam_t sramWriteParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"data", CLI_PARAM_TYPE_UCHAR}};
-cliParam_t sramPrintParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
-cliParam_t sramWriteBytesParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
+cliParam_t EEPROMWriteParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"data", CLI_PARAM_TYPE_UCHAR}};
+cliParam_t EEPROMPrintParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
+cliParam_t EEPROMWriteBytesParams[] = {{"address", CLI_PARAM_TYPE_UINT}, {"count", CLI_PARAM_TYPE_UINT}};
 cliParam_t params[] = {{"value", CLI_PARAM_TYPE_UINT}};
 
-void sramWriteCbk(const char* cmdName, char** params, unsigned char numParams)
+void EEPROMWriteCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int addr = atoi(params[0]);
     unsigned char data = atoi(params[1]);
-    SRAM_Write(addr, data);
+    //EEPROM_Write(addr, data);
+    EEPROM_Page_Write(addr, data);
 }
 
-void sramPrintCbk(const char* cmdName, char** params, unsigned char numParams)
+void EEPROMPrintCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int addr = atol(params[0]);
     unsigned int count = atol(params[1]);
-    SRAM_Print(addr, count);
+    EEPROM_Print(addr, count);
 }
 
-void sramWriteBytesCbk(const char* cmdName, char** params, unsigned char numParams)
+void EEPROMWriteBytesCbk(const char* cmdName, char** params, unsigned char numParams)
 {
 #define RX_INDICATOR_COUNT 512
     unsigned int addr = atol(params[0]);
@@ -46,7 +47,7 @@ void sramWriteBytesCbk(const char* cmdName, char** params, unsigned char numPara
 
     while(currCnt < numBytes)
     {
-        SRAM_Write(addr++, getchar());
+        EEPROM_Write(addr++, getchar());
         if(RX_INDICATOR_COUNT-1 == currCnt % RX_INDICATOR_COUNT)
             putch('.');
         currCnt++;
@@ -54,25 +55,48 @@ void sramWriteBytesCbk(const char* cmdName, char** params, unsigned char numPara
     printf("Done\r\n");
 }
 
-#include "SRAM.h"
+
+#if 0
+unsigned long int hexDecStrToLong(char* str)
+{
+    unsigned long int val;
+    if(str[0] == '0' && str[1] == 'x')
+        sscanf(str, "0x%x", &val);
+    else
+        sscanf(str, "%ld", &val);
+    return val;
+}
+#endif
+
+
 void testCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-    SRAM_Clear();
+    //EEPROM_Erase_Chip();
+    int i;
+    EEPROM_Write(0x5555, 0xaa);
+    EEPROM_Write(0x2aaa, 0x55);
+    EEPROM_Write(0x5555, 0xA0);
+    for(i = 0; i < 128; i++)
+        EEPROM_Write(i, i);
+}
+void eraseCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    EEPROM_Erase_Chip();
 }
 void ceCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int val = atoi(params[0]) & 0xff;
-    SRAM_CE = val;
+    EEPROM_CE = val;
 }
 void weCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int val = atoi(params[0]) & 0xff;
-    SRAM_WE = val;
+    EEPROM_WE = val;
 }
 void oeCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int val = atoi(params[0]) & 0xff;
-    SRAM_OE = val;
+    EEPROM_OE = val;
 }
 void dCbk(const char* cmdName, char** params, unsigned char numParams)
 {
@@ -104,10 +128,12 @@ uint8_t main(void)
     cliInit();
 
     // CLI Command registration
-    CLI_REGISTER_CMD("md", sramPrintCbk, sramPrintParams);
-    CLI_REGISTER_CMD("mw", sramWriteCbk, sramWriteParams);
-    CLI_REGISTER_CMD("mm", sramWriteBytesCbk, sramWriteBytesParams);
+    CLI_REGISTER_CMD("md", EEPROMPrintCbk, EEPROMPrintParams);
+    CLI_REGISTER_CMD("mw", EEPROMWriteCbk, EEPROMWriteParams);
+    CLI_REGISTER_CMD("mm", EEPROMWriteBytesCbk, EEPROMWriteBytesParams);
     CLI_REGISTER_CMD("t", testCbk, 0);
+    //CLI_REGISTER_CMD("t", testCbk, params);
+    CLI_REGISTER_CMD("erase", eraseCbk, 0);
     CLI_REGISTER_CMD("ce", ceCbk, params);
     CLI_REGISTER_CMD("we", weCbk, params);
     CLI_REGISTER_CMD("oe", oeCbk, params);

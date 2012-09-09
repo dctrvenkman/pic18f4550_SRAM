@@ -8,7 +8,7 @@
 #include <plib.h>
 
 #include "user.h"
-#include "SRAM.h"
+#include "EEPROM.h"
 
 /******************************************************************************/
 /* User Functions                                                             */
@@ -23,7 +23,7 @@ void InitApp(void)
     /* TODO Initialize User Ports/Peripherals/Project here */
 
     /* Setup analog functionality and port direction */
-    SRAM_Setup_Pins();
+    EEPROM_Setup_Pins();
 
     /* Initialize peripherals */
     CloseUSART();

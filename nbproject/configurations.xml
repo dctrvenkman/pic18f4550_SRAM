@@ -10,7 +10,7 @@
       <itemPath>uart.h</itemPath>
       <itemPath>htc_wrapper.h</itemPath>
       <itemPath>cliParser.h</itemPath>
-      <itemPath>SRAM.h</itemPath>
+      <itemPath>EEPROM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LibraryFiles"
                    displayName="Library Files"
@@ -31,7 +31,7 @@
       <itemPath>uart.c</itemPath>
       <itemPath>cirBuff.c</itemPath>
       <itemPath>cliParser.c</itemPath>
-      <itemPath>SRAM.c</itemPath>
+      <itemPath>EEPROM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
