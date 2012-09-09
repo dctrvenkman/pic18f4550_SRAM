@@ -36,31 +36,26 @@
 
 //OE = RE0
 #define EEPROM_OE         PORTEbits.RE0
-
 //WE = RE1
 #define EEPROM_WE         PORTEbits.RE1
-
 //CE = RE2
 #define EEPROM_CE         PORTEbits.RE2
 
 
-#define EEPROM_DELAY_US   0//100 //@8MHz clk delay is 500ns
-
-// Number of bytes printed per line for EEPROM_Print
-#define EEPROM_PRINT_ROW_CNT    16
-
 #define EEPROM_PAGE_SIZE        128
+
+//Assumes page size is power of 2
+#define ADDR_TO_PAGE_BASE_ADDR(addr) (addr & (~(EEPROM_PAGE_SIZE - 1)))
+
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-
 void EEPROM_Setup_Pins();
 unsigned char EEPROM_Read(unsigned long int addr);
 void EEPROM_Write(unsigned long int addr, unsigned char data);
 void EEPROM_Print(unsigned int addr, unsigned int count);
-
 void EEPROM_Page_Write(unsigned long int addr, unsigned char data);
 void EEPROM_Erase_Chip();
 void EEPROM_ID();

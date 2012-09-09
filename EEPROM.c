@@ -3,6 +3,13 @@
 #include "system.h"
 #include "EEPROM.h"
 
+// Number of bytes printed per line for EEPROM_Print
+#define EEPROM_PRINT_ROW_CNT    16
+
+// Temporary storage for a whole page
+unsigned char tmpPageData[EEPROM_PAGE_SIZE];
+
+
 void EEPROM_Setup_Pins()
 {
     // Set all analog pins to digital I/O
@@ -111,22 +118,17 @@ void EEPROM_Write(unsigned long int addr, unsigned char data)
     EEPROM_DATA_TRIS = 0xFF; // back to inputs just incase
 }
 
-//assumes page size is power of 2
-#define ADDR_TO_PAGE_BASE_ADDR(addr) (addr & (~EEPROM_PAGE_SIZE - EEPROM_PAGE_SIZE - 1))
-
-unsigned char tmpPageData[EEPROM_PAGE_SIZE];
-
 void EEPROM_Page_Write(unsigned long int addr, unsigned char data)
 {
     unsigned int i;
-    unsigned long int pageBaseAddr = 0;//addr & ~127;//ADDR_TO_PAGE_BASE_ADDR(addr);
+    unsigned long int pageBaseAddr = ADDR_TO_PAGE_BASE_ADDR(addr);
 
     // Store existing page data
     for(i = 0; i < EEPROM_PAGE_SIZE; i++)
         tmpPageData[i] = EEPROM_Read(pageBaseAddr + i);
 
     // Update page data with the new value
-    tmpPageData[addr] = data;
+    tmpPageData[addr - pageBaseAddr] = data;
 
     // Enter Page Write Cycle
     EEPROM_Write(0x5555, 0xaa);
