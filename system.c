@@ -17,9 +17,13 @@ void ConfigureOscillator(void)
     /* Typical actions in this function are to tweak the oscillator tuning
     register, select new clock sources, and to wait until new clock sources
     are stable before resuming execution of the main project. */
-    
-    OSCCONbits.IRCF = 0x7; //Set int osc dividers for freq of 8Mhz
-    OSCCONbits.SCS = 0x2; //Set system clock to use int osc
 
-    //OSCCONbits.SCS = 0; //Use external clock
+    // For internal 8MHz oscillator
+    //OSCCONbits.IRCF = 0x7; //Set int osc dividers for freq of 8Mhz
+    //OSCCONbits.SCS = 0x2; //Set system clock to use int osc
+
+    // For external oscillator
+    while(!OSCCONbits.OSTS)
+        ;
+    OSCCONbits.SCS = 0; //Use external clock
 }

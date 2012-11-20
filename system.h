@@ -3,11 +3,11 @@
 /******************************************************************************/
 
 /* Microcontroller MIPs (FCY) */
-#define SYS_FREQ        8000000L
+#define SYS_FREQ        20000000L
 #define FCY             SYS_FREQ/4
 
 //For use in __delay functions
-#define _XTAL_FREQ      8000000
+#define _XTAL_FREQ      20000000
 
 /******************************************************************************/
 /* System Function Prototypes                                                 */

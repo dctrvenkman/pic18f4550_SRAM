@@ -41,12 +41,10 @@
 //CE = RE2
 #define EEPROM_CE         PORTEbits.RE2
 
-
 #define EEPROM_PAGE_SIZE        128
 
 //Assumes page size is power of 2
 #define ADDR_TO_PAGE_BASE_ADDR(addr) (addr & (~(EEPROM_PAGE_SIZE - 1)))
-
 
 #ifdef	__cplusplus
 extern "C" {
@@ -56,7 +54,9 @@ void EEPROM_Setup_Pins();
 unsigned char EEPROM_Read(unsigned long int addr);
 void EEPROM_Write(unsigned long int addr, unsigned char data);
 void EEPROM_Print(unsigned int addr, unsigned int count);
-void EEPROM_Page_Write(unsigned long int addr, unsigned char data);
+void EEPROM_Write_Byte(unsigned long int addr, unsigned char data);
+void EEPROM_Write_Page(unsigned long int addr, unsigned char* data);
+void EEPROM_Data_Protect_Disable();
 void EEPROM_Erase_Chip();
 void EEPROM_ID();
 

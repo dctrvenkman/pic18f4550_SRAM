@@ -27,8 +27,7 @@ void EEPROMWriteCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int addr = atoi(params[0]);
     unsigned char data = atoi(params[1]);
-    //EEPROM_Write(addr, data);
-    EEPROM_Page_Write(addr, data);
+    EEPROM_Write_Byte(addr, data);
 }
 
 void EEPROMPrintCbk(const char* cmdName, char** params, unsigned char numParams)
@@ -40,23 +39,52 @@ void EEPROMPrintCbk(const char* cmdName, char** params, unsigned char numParams)
 
 void EEPROMWriteBytesCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-#define RX_INDICATOR_COUNT 512
     unsigned int addr = atol(params[0]);
     unsigned int numBytes = atol(params[1]);
     unsigned int currCnt = 0;
 
     while(currCnt < numBytes)
     {
-        EEPROM_Page_Write(addr++, getchar());
-        if(RX_INDICATOR_COUNT-1 == currCnt % RX_INDICATOR_COUNT)
+        EEPROM_Write_Byte(addr++, getchar());
+        if(EEPROM_PAGE_SIZE-1 == currCnt % EEPROM_PAGE_SIZE)
             putch('.');
         currCnt++;
     }
     printf("Done\r\n");
 }
 
+unsigned char pageData[EEPROM_PAGE_SIZE];
 
-#if 0
+void EEPROMFillCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    unsigned int numBytes = atol(params[0]);
+    unsigned int currCnt = 0;
+    unsigned int i; // Use extra var so as not to have to calc currCnt % 128
+
+    while(currCnt < numBytes)
+    {
+        for(i = 0; i < EEPROM_PAGE_SIZE; i++)
+        {
+            pageData[i] = getchar();
+            currCnt++;
+        }
+        EEPROM_Write_Page(currCnt - 1, pageData);
+        putch('.');
+    }
+    printf("Done\r\n");
+}
+
+void unprotectCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    EEPROM_Data_Protect_Disable();
+}
+
+void eraseCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    EEPROM_Erase_Chip();
+}
+
+#if 0 // Messes up scanf
 unsigned long int hexDecStrToLong(char* str)
 {
     unsigned long int val;
@@ -69,20 +97,24 @@ unsigned long int hexDecStrToLong(char* str)
 #endif
 
 
+
 void testCbk(const char* cmdName, char** params, unsigned char numParams)
 {
-    //EEPROM_Erase_Chip();
-    int i;
+    unsigned char addr = atoi(params[0]);
+    unsigned char data = atoi(params[1]);
+
+    // Enter Page Write Cycle
     EEPROM_Write(0x5555, 0xaa);
     EEPROM_Write(0x2aaa, 0x55);
     EEPROM_Write(0x5555, 0xA0);
-    for(i = 0; i < 128; i++)
-        EEPROM_Write(i, i);
+
+    EEPROM_Write(addr, data);
+
+    __delay_us(200); //Tblco
+    // TODO: Use one of the methods to determine if write has completed
+    __delay_ms(10); //Twc
 }
-void eraseCbk(const char* cmdName, char** params, unsigned char numParams)
-{
-    EEPROM_Erase_Chip();
-}
+#ifdef DEBUG
 void ceCbk(const char* cmdName, char** params, unsigned char numParams)
 {
     unsigned int val = atoi(params[0]) & 0xff;
@@ -111,6 +143,22 @@ void aCbk(const char* cmdName, char** params, unsigned char numParams)
     setAddressLines(val);
 }
 
+void cCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    PORTB = 0xff;
+    //__delay_ms(1);
+    PORTB = 0x00;
+}
+
+void crCbk(const char* cmdName, char** params, unsigned char numParams)
+{
+    while(true)
+    {
+        PORTB ^= PORTB;
+    }
+}
+#endif
+
 /******************************************************************************/
 /* Main Program                                                               */
 /******************************************************************************/
@@ -131,18 +179,22 @@ uint8_t main(void)
     CLI_REGISTER_CMD("md", EEPROMPrintCbk, EEPROMPrintParams);
     CLI_REGISTER_CMD("mw", EEPROMWriteCbk, EEPROMWriteParams);
     CLI_REGISTER_CMD("mm", EEPROMWriteBytesCbk, EEPROMWriteBytesParams);
-    CLI_REGISTER_CMD("t", testCbk, 0);
-    //CLI_REGISTER_CMD("t", testCbk, params);
+    CLI_REGISTER_CMD("mf", EEPROMFillCbk, params);
+    CLI_REGISTER_CMD("unprotect", unprotectCbk, 0);
     CLI_REGISTER_CMD("erase", eraseCbk, 0);
+
+    CLI_REGISTER_CMD("t", testCbk, EEPROMWriteParams);
+#ifdef DEBUG
+    CLI_REGISTER_CMD("t", testCbk, EEPROMWriteParams);
+    CLI_REGISTER_CMD("t", testCbk, 0);
     CLI_REGISTER_CMD("ce", ceCbk, params);
     CLI_REGISTER_CMD("we", weCbk, params);
     CLI_REGISTER_CMD("oe", oeCbk, params);
     CLI_REGISTER_CMD("d", dCbk, params);
     CLI_REGISTER_CMD("a", aCbk, params);
-
-
-    //test();
-
+    CLI_REGISTER_CMD("c", cCbk, 0);
+    CLI_REGISTER_CMD("cr", crCbk, 0);
+#endif
 
     // Application Loop
     while(1)

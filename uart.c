@@ -55,7 +55,7 @@ void writeUART(char* buffer, unsigned int count)
 // To implement printf putch must be defined
 void putch(char data)
 {
-#if 1
+#if 0
     while(!TXIF)
         continue;
     TXREG = data;
@@ -74,5 +74,6 @@ char getche()
     // Blocking loop
     while(BUFFER_STATUS_SUCCESS != cirBufferRemove(&rxCirBuff, &retVal))
         ;
+    //putch(retVal);
     return retVal;
 }

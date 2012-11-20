@@ -32,12 +32,15 @@ void InitApp(void)
     /* SPBRG based on 8MHz clk */
     //spbrg = 16;   //115200
     //spbrg = 34;   // 57600
-    spbrg = 103;  // 19200 known working w/ 8MHz clock
+    //spbrg = 103;  // 19200 known working w/ 8MHz clock
     //spbrg = 207;  //  9600
     //spbrg = 832;  //  2400
-    //spbrg = 1665;   //  1200
+    //spbrg = 1665; //  1200
     /* SPBRG based on 48MHz clk */
-    //spbrg = 103; //115200 48MHz
+    //spbrg = 103;  //115200 48MHz
+    /* SPBRG based on 20MHz clk */
+    //spbrg = 42;     //115200
+    spbrg = 86;   // 57600
     OpenUSART(config, spbrg);
     baudconfig = BAUD_IDLE_CLK_LOW & BAUD_16_BIT_RATE & BAUD_WAKEUP_OFF & BAUD_AUTO_OFF;
     baudconfig &= ~0x20; // RX Not inverted
